@@ -1,0 +1,94 @@
+import cv2
+import numpy as np
+import tkinter as tk
+from tkinter import filedialog
+from PIL import Image, ImageTk
+import os
+
+# Fungsi untuk memproses gambar
+def process_image(image_path):
+    global processed_image
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+    if image is None:
+        return None
+
+    # 1. Histogram Equalization
+    equalized_image = cv2.equalizeHist(image)
+
+    # 2. Noise Reduction (Gaussian Blur)
+    denoised_image = cv2.GaussianBlur(equalized_image, (5, 5), 0)
+
+    # 3. Sharpening
+    sharpening_kernel = np.array([[0, -1, 0],
+                                  [-1, 5, -1],
+                                  [0, -1, 0]], 
+dtype=np.float32)
+    sharpened_image = cv2.filter2D(denoised_image, -1, sharpening_kernel)
+
+    processed_image = sharpened_image
+    return sharpened_image
+
+# Fungsi untuk memilih file gambar
+def select_image():
+    file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg;*.png;*.jpeg")])
+    if file_path:
+        global selected_image_path
+        selected_image_path = file_path
+        display_image(file_path, original_label)
+
+# Fungsi untuk menampilkan gambar di GUI
+def display_image(image_path, label_widget):
+    image = Image.open(image_path)
+    image = image.resize((300, 300))  # Ubah ukuran agar sesuai dengan GUI
+    photo = ImageTk.PhotoImage(image)
+    label_widget.config(image=photo)
+    label_widget.image = photo
+
+# Fungsi untuk menampilkan hasil pemrosesan gambar
+def display_processed_image():
+ if selected_image_path:
+        processed_img = process_image(selected_image_path)
+        if processed_img is not None:
+            save_path = "output/processed_image.jpg"
+            if not os.path.exists("output"):
+                os.makedirs("output")
+            cv2.imwrite(save_path, processed_img)
+            display_image(save_path, processed_label)
+
+# Fungsi untuk menyimpan hasil gambar
+def save_processed_image():
+    if processed_image is not None:
+        save_path = filedialog.asksaveasfilename(defaultextension=".jpg",
+                                                 filetypes=[("JPEG files", "*.jpg"),
+                                                            ("PNG files", "*.png"),
+                                                            ("All Files", "*.*")])
+        if save_path:
+            cv2.imwrite(save_path, processed_image)
+            print(f"Hasil gambar disimpan di {save_path}")
+# Membuat GUI dengan Tkinter
+root = tk.Tk()
+root.title("Image Enhancement App")
+
+# Label untuk menampilkan gambar asli
+original_label = tk.Label(root, text="Gambar Asli")
+original_label.pack()
+
+# Tombol untuk memilih gambar
+select_button = tk.Button(root, text="Pilih Gambar", command=select_image)
+select_button.pack()
+
+# Label untuk menampilkan hasil gambar
+processed_label = tk.Label(root, text="Hasil Pemrosesan")
+processed_label.pack()
+
+# Tombol untuk memproses gambar
+process_button = tk.Button(root, text="Proses Gambar", command=display_processed_image)
+process_button.pack()
+
+# Tombol untuk menyimpan gambar hasil pemrosesan
+save_button = tk.Button(root, text="Simpan Gambar", command=save_processed_image)
+save_button.pack()
+
+# Jalankan GUI
+root.mainloop()

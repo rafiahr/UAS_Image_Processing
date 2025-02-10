@@ -1,0 +1,40 @@
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Fungsi untuk menampilkan gambar
+def show_image(image, title='Image'):
+    plt.imshow(image, cmap='gray')
+    plt.title(title)
+    plt.axis('off')
+    plt.show()
+
+# Membaca gambar dari file
+image_path = 'input.jpg'  # Ganti dengan gambar yang sesuai
+image = cv2.imread(image_path)
+
+# Periksa apakah gambar berhasil dimuat
+if image is None:
+    print("Error: Gambar tidak ditemukan! Pastikan file 'input.jpg' ada di folder yang sama.")
+    exit()
+
+# Menampilkan gambar asli
+show_image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB), title='Gambar Asli')
+
+# ⿡ Mengubah gambar ke grayscale
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+show_image(gray_image, title='Gambar Grayscale')
+
+# ⿢ Menerapkan Histogram Equalization untuk meningkatkan kontras
+equalized_image = cv2.equalizeHist(gray_image)
+show_image(equalized_image, title='Gambar Setelah Sharpening')
+
+# ⿥ Menyimpan semua hasil
+cv2.imwrite('hasil_grayscale.jpg', gray_image)
+cv2.imwrite('hasil_equalized.jpg', equalized_image)
+cv2.imwrite('hasil_gaussian_blur.jpg', gaussian_blur)
+cv2.imwrite('hasil_median_filtered.jpg', median_filtered)
+cv2.imwrite('hasil_bilateral_filtered.jpg', bilateral_filtered)
+cv2.imwrite('hasil_sharpened.jpg', sharpened_image)
+
+print("Semua gambar hasil telah disimpan!")

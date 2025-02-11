@@ -1,0 +1,57 @@
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Fungsi untuk menampilkan gambar
+def show_image(image, title='Image'):
+    plt.imshow(image, cmap='gray')
+    plt.title(title)
+    plt.axis('off')
+    plt.show()
+
+# Membaca gambar dari file
+image_path = 'pkkmb.jpg'  # Ganti dengan gambar yang sesuai
+image = cv2.imread(image_path)
+
+# Periksa apakah gambar berhasil dimuat
+if image is None:
+    print("Error: Gambar tidak ditemukan! Pastikan file 'pkkmb.jpg' ada di folder yang sama.")
+    exit()
+
+# Menampilkan gambar asli
+show_image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB), title='Gambar Asli')
+
+# Mengubah gambar ke grayscale
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+show_image(gray_image, title='Gambar Grayscale')
+
+# Menerapkan Histogram Equalization untuk meningkatkan kontras
+equalized_image = cv2.equalizeHist(gray_image)
+show_image(equalized_image, title='Gambar Setelah Histogram Equalization')
+
+# Menerapkan Gaussian Blur untuk mengurangi noise
+gaussian_blur = cv2.GaussianBlur(gray_image, (5, 5), 0)
+show_image(gaussian_blur, title='Gambar Setelah Gaussian Blur')
+
+# Menerapkan Median Filtering untuk pengurangan noise lebih lanjut
+median_filtered = cv2.medianBlur(gray_image, 5)
+show_image(median_filtered, title='Gambar Setelah Median Filter')
+
+# Menerapkan Bilateral Filter untuk mengurangi noise sambil mempertahankan tepi
+bilateral_filtered = cv2.bilateralFilter(gray_image, 9, 75, 75)
+show_image(bilateral_filtered, title='Gambar Setelah Bilateral Filter')
+
+# Menerapkan teknik Sharpening untuk meningkatkan ketajaman gambar
+sharpening_kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]], dtype=np.float32)
+sharpened_image = cv2.filter2D(gray_image, -1, sharpening_kernel)
+show_image(sharpened_image, title='Gambar Setelah Sharpening')
+
+# Menyimpan semua hasil
+cv2.imwrite('hasil_grayscale.jpg', gray_image)
+cv2.imwrite('hasil_equalized.jpg', equalized_image)
+cv2.imwrite('hasil_gaussian_blur.jpg', gaussian_blur)
+cv2.imwrite('hasil_median_filtered.jpg', median_filtered)
+cv2.imwrite('hasil_bilateral_filtered.jpg', bilateral_filtered)
+cv2.imwrite('hasil_sharpened.jpg', sharpened_image)
+
+print("Semua gambar hasil telah disimpan!")
